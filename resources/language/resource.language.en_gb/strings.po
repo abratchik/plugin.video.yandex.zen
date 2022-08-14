@@ -1,0 +1,329 @@
+﻿# Kodi Media Center language file
+# Addon Name: yandex.zen
+# Addon id: plugin.video.yandex.zen
+# Addon Provider: Alex Bratchik
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+
+msgctxt "#30000"
+msgid "Information"
+msgstr "Information"
+
+msgctxt "#30001"
+msgid "Refresh from site"
+msgstr "Refresh from site"
+
+msgctxt "#30010"
+msgid "Search"
+msgstr "Search"
+
+msgctxt "#30011"
+msgid "Search Smotrim.ru website"
+msgstr "Search Smotrim.ru website"
+
+msgctxt "#30012"
+msgid "New search"
+msgstr "New search"
+
+msgctxt "#30020"
+msgid "Home"
+msgstr "Home"
+
+msgctxt "#30021"
+msgid "Return to Home page"
+msgstr "Return to Home page"
+
+msgctxt "#30022"
+msgid "Smotrim.ru"
+msgstr "Smotrim.ru"
+
+msgctxt "#30023"
+msgid "Favorites"
+msgstr "Favorites"
+
+msgctxt "#30030"
+msgid "Next"
+msgstr "Next"
+
+msgctxt "#30031"
+msgid "Page %s of %s"
+msgstr "Page %s of %s"
+
+msgctxt "#30032"
+msgid "Previous"
+msgstr "Previous"
+
+msgctxt "#30033"
+msgid "First"
+msgstr "First"
+
+msgctxt "#30034"
+msgid "Last"
+msgstr "Last"
+
+msgctxt "#30040"
+msgid "Episodes"
+msgstr "Episodes"
+
+msgctxt "#30050"
+msgid "History"
+msgstr "History"
+
+msgctxt "#30051"
+msgid "Last watched movies from Smotrim.ru"
+msgstr "Last watched movies from  Smotrim.ru"
+
+msgctxt "#30060"
+msgid "Playback error"
+msgstr "Playback error"
+
+msgctxt "#30070"
+msgid "Podcasts"
+msgstr "Podcasts"
+
+msgctxt "#30100"
+msgid "Account"
+msgstr "Account"
+
+msgctxt "#30101"
+msgid "Phone number"
+msgstr "Phone number"
+
+msgctxt "#30110"
+msgid "Interface"
+msgstr "Interface"
+
+msgctxt "#30111"
+msgid "Items per page"
+msgstr "Items per page"
+
+msgctxt "#30112"
+msgid "Keep track of viewing history"
+msgstr "Keep track of viewing history"
+
+msgctxt "#30113"
+msgid "Auto play next episode"
+msgstr "Auto play next episode"
+
+msgctxt "#30114"
+msgid "Enable extended info service"
+msgstr "Enable extended info on movies and series"
+
+msgctxt "#30115"
+msgid "Add News feed to RSS"
+msgstr "Add News feed to RSS"
+
+msgctxt "#30120"
+msgid "Video"
+msgstr "Video"
+
+msgctxt "#30121"
+msgid "Quality"
+msgstr "Quality"
+
+msgctxt "#30122"
+msgid "auto"
+msgstr "auto"
+
+msgctxt "#30123"
+msgid "fhd-wide"
+msgstr "1920x1080"
+
+msgctxt "#30124"
+msgid "hd-wide"
+msgstr "1280x720"
+
+msgctxt "#30125"
+msgid "high-wide"
+msgstr "960x540"
+
+msgctxt "#30128"
+msgid "high"
+msgstr "800x600"
+
+msgctxt "#30126"
+msgid "medium-wide"
+msgstr "640x360"
+
+msgctxt "#30129"
+msgid "medium"
+msgstr "640x480"
+
+msgctxt "#30127"
+msgid "low-wide"
+msgstr "416x243"
+
+msgctxt "#30130"
+msgid "low"
+msgstr "320x240"
+
+msgctxt "#30200"
+msgid "Premieres"
+msgstr "Premieres"
+
+msgctxt "#30201"
+msgid "Cinema"
+msgstr "Cinema"
+
+msgctxt "#30202".4
+msgid "Documentary"
+msgstr "Documentary"
+
+msgctxt "#30203"
+msgid "Watching now"
+msgstr "Watching now"
+
+msgctxt "#30204"
+msgid "Biopicks"
+msgstr "Biopicks"
+
+msgctxt "#30205"
+msgid "Politics"
+msgstr "Politics"
+
+msgctxt "#30206"
+msgid "Society"
+msgstr "Society"
+
+msgctxt "#30207"
+msgid "Historical"
+msgstr "Historical"
+
+msgctxt "#30208"
+msgid "Sport"
+msgstr "Sport"
+
+msgctxt "#30209"
+msgid "Culture"
+msgstr "Culture"
+
+msgctxt "#30210"
+msgid "Series"
+msgstr "Series"
+
+msgctxt "#30211"
+msgid "Popular shows"
+msgstr "Popular shows"
+
+msgctxt "#30212"
+msgid "Sience"
+msgstr "Sience"
+
+msgctxt "#30213"
+msgid "Dramas"
+msgstr "Dramas"
+
+msgctxt "#30214"
+msgid "Love stories"
+msgstr "Love stories"
+
+msgctxt "#30215"
+msgid "Melodramas"
+msgstr "Melodramas"
+
+msgctxt "#30216"
+msgid "Crime"
+msgstr "Crime"
+
+msgctxt "#30217"
+msgid "Screen versions"
+msgstr "Screen versions"
+
+msgctxt "#30218"
+msgid "Art"
+msgstr "Art"
+
+msgctxt "#30219"
+msgid "Classics"
+msgstr "Classics"
+
+msgctxt "#30220"
+msgid "Historical"
+msgstr "Historical"
+
+msgctxt "#30221"
+msgid "Children"
+msgstr "Children"
+
+msgctxt "#30222"
+msgid "Our picks"
+msgstr "Our picks"
+
+msgctxt "#30223"
+msgid "Comedies"
+msgstr "Comedies"
+
+msgctxt "#30224"
+msgid "Live broadcasts"
+msgstr "Live broadcasts"
+
+msgctxt "#30300"
+msgid "Home"
+msgstr "Home"
+
+msgctxt "#30301"
+msgid "News"
+msgstr "News"
+
+msgctxt "#30302"
+msgid "(Video)"
+msgstr "(Video)"
+
+msgctxt "#30350"
+msgid "Clear search history"
+msgstr "Clear search history"
+
+msgctxt "#30400"
+msgid "Channels"
+msgstr "Channels"
+
+msgctxt "#30405"
+msgid "Hide empty channels"
+msgstr "Hide empty channels"
+
+msgctxt "#30407"
+msgid "Check channel %s"
+msgstr "Check channel %s"
+
+msgctxt "#30408"
+msgid "Searching live broadcast on %s"
+msgstr "Searching live broadcast on %s"
+
+msgctxt "#30410"
+msgid "Live TV"
+msgstr "Live TV"
+
+msgctxt "#30415"
+msgid "Install IPTV Manager add-on"
+msgstr "Install IPTV Manager add-on"
+
+msgctxt "#30418"
+msgid "IPTV Manager settings…"
+msgstr "IPTV Manager settings…"
+
+msgctxt "#30420"
+msgid "Enable IPTV Manager integration"
+msgstr "Enable IPTV Manager integration"
+
+msgctxt "#30430"
+msgid "IPTV playlist"
+msgstr "IPTV playlist"
+
+msgctxt "#30431"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#30435"
+msgid "completed successfully"
+msgstr "completed successfully"
+
+msgctxt "#30440"
+msgid "TV guide time shift, hrs"
+msgstr "TV guide time shift, hrs"
+
+msgctxt "#30500"
+msgid "Please enter code you got on your mobile"
+msgstr "Please enter code you got on your mobile"
