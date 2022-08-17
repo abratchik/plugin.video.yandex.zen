@@ -6,6 +6,7 @@
 import xbmc
 
 import resources.lib.modules.pages as pages
+import resources.lib.modules.searches as searches
 import resources.lib.modules.videos as videos
 from resources.lib.kodiutils import get_url
 
@@ -13,9 +14,11 @@ from resources.lib.kodiutils import get_url
 class Home(pages.Page):
 
     def get_data_query(self):
+        search = searches.Search(self.site)
         video = videos.Video(self.site)
 
-        home_menu = [video.create_root_li(),
+        home_menu = [search.create_root_li(),
+                     video.create_root_li(),
                      self.create_fav_li()]
 
         return {'data': home_menu}

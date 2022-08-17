@@ -7,18 +7,13 @@
 import json
 import os
 import time
-import re
 
 import xbmc
 import xbmcgui
 import xbmcplugin
-import hashlib
 
 from urllib.parse import quote as encode4url
 from ..kodiutils import remove_files_by_pattern, upnext_signal, kodi_version_major, get_url
-import resources.lib.kodiplayer as kodiplayer
-from ..yandexzen import USER_AGENT
-from ..kodiutils import clean_html
 
 
 class Page(object):
@@ -177,7 +172,7 @@ class Page(object):
 
         return int(now - mod_time) > self.cache_expire
 
-    def get_nav_url(self, load_url, offset=0):
+    def get_nav_url(self, load_url="", offset=0):
         return get_url(self.site.url,
                        action=self.site.action,
                        context=self.site.context,
