@@ -38,12 +38,12 @@ class YandexZen:
 
         self.params = {}
 
-        self.domain = "smotrim.ru"
-        self.api_host = "api.smotrim.ru"
-        self.cdnapi_host = "cdnapi.smotrim.ru"
-        self.api_url = "https://%s/api/v1" % self.api_host
-        self.cdnapi_url = "https://%s/api/v1" % self.cdnapi_host
-        self.liveapi_host = "player.smotrim.ru"
+        self.domain = "zen.yandex.ru"
+        self.api_host = self.domain
+        self.cdnapi_host = self.domain
+        self.api_url = "https://%s/api/v3" % self.api_host
+        self.cdnapi_url = self.api_url
+        self.liveapi_host = self.domain
         self.liveapi_url = "https://%s" % self.liveapi_host
 
         self.language = self.addon.getLocalizedString
@@ -114,13 +114,12 @@ class YandexZen:
 
         return keyword
 
-    @staticmethod
-    def prepare_url(url):
+    def prepare_url(self, url):
         return "|".join([url,
                          "&".join(
                              ["User-Agent=%s" % encode4url(USER_AGENT),
-                              "Origin=%s" % encode4url("https://player.smotrim.ru"),
-                              "Referer=%s" % encode4url("https://player.smotrim.ru/"),
+                              "Origin=%s" % encode4url(self.liveapi_url),
+                              "Referer=%s" % encode4url(self.liveapi_url),
                               "!Sec-Fetch-Dest=empty",
                               "!Sec-Fetch-Mode=cors",
                               "!Sec-Fetch-Site=cross-site",

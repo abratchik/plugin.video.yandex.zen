@@ -21,8 +21,8 @@ msgid "Search"
 msgstr "Поиск"
 
 msgctxt "#30011"
-msgid "Search Smotrim.ru website"
-msgstr "Поиск по сайту Smotrim.ru"
+msgid "Search Yandex Zen website"
+msgstr "Поиск по сайту Yandex Zen"
 
 msgctxt "#30012"
 msgid "New search"
@@ -37,8 +37,8 @@ msgid "Return to Home page"
 msgstr "Вернуться на главную страницу"
 
 msgctxt "#30022"
-msgid "Smotrim.ru"
-msgstr "Смотрим"
+msgid "Yandex Zen"
+msgstr "Яндекс Дзен"
 
 msgctxt "#30023"
 msgid "Favorites"
@@ -49,8 +49,8 @@ msgid "Next"
 msgstr "Вперед"
 
 msgctxt "#30031"
-msgid "Page %s of %s"
-msgstr "Страница %s из %s"
+msgid "Page %s"
+msgstr "Страница %s"
 
 msgctxt "#30032"
 msgid "Previous"
@@ -73,8 +73,8 @@ msgid "History"
 msgstr "История"
 
 msgctxt "#30051"
-msgid "Last watched movies from Smotrim.ru"
-msgstr "Ваша история просмотров видео Smotrim.ru"
+msgid "Last watched movies from Yandex Zen"
+msgstr "Ваша история просмотров видео Yandex Zen"
 
 msgctxt "#30060"
 msgid "Playback error"
@@ -117,7 +117,7 @@ msgid "Add News feed to RSS"
 msgstr "Добавить ленту новостей в RSS"
 
 msgctxt "#30120"
-msgid "Video"
+msgid "Videos"
 msgstr "Видео"
 
 msgctxt "#30121"

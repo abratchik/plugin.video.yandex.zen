@@ -20,8 +20,6 @@ import resources.lib.kodiplayer as kodiplayer
 from ..yandexzen import USER_AGENT
 from ..kodiutils import clean_html
 
-MAXRECORDS = 9999
-
 
 class Page(object):
 
@@ -35,24 +33,15 @@ class Page(object):
         self.context_menu_items = []
         self.offset = 0
         self.limit = 0
-        self.pages = 0
+
+        self.next_page = ""
+        self.prev_page = ""
 
         self.cache_enabled = False
         self.cache_file = ""
         self.cache_expire = int(self.params.get('cache_expire', 0))
 
-        self.KEYWORDS = []
-        with open(os.path.join(self.site.path, "resources/data/keywords.json"), "r+", encoding="utf-8") as f:
-            self.KEYWORDS = json.load(f)
-
-        self.VQUALITY = ["auto", "fhd-wide", "hd-wide", "high-wide", "high", "medium-wide", "medium", "low-wide", "low"]
-
     def load(self):
-
-        self.offset = self.params.get('offset', 0)
-        self.limit = self.get_limit_setting()
-
-        xbmc.log("Items per page: %s" % self.limit, xbmc.LOGDEBUG)
 
         self.preload()
 
@@ -62,23 +51,21 @@ class Page(object):
 
         self.data = self.get_data_query()
 
+        xbmc.log("Items per page: %s" % len(self.data['data']), xbmc.LOGDEBUG)
+
         self.set_context_title()
 
-        self.set_limit_offset_pages()
+        self.set_navigation_pages()
 
-        if self.pages > 1:
-            if self.offset > 0:
-                self.list_items.append(self.create_menu_li("previous",
-                                                           label=30032, is_folder=True, is_playable=False,
-                                                           url=self.get_nav_url(offset=self.offset - 1),
-                                                           info={'plot': self.site.language(30031) %
-                                                                         (self.offset + 1, self.pages)}))
-            if self.offset > 1:
-                self.list_items.append(self.create_menu_li("first", label=30033, is_folder=True, is_playable=False,
-                                                           url=self.get_nav_url(offset=0),
-                                                           info={'plot': self.site.language(30031) %
-                                                                         (self.offset + 1, self.pages)}))
+        if self.prev_page and self.offset > 0:
+            self.list_items.append(self.create_menu_li("previous",
+                                                       label=30032, is_folder=True, is_playable=False,
+                                                       url=self.get_nav_url(load_url=self.prev_page,
+                                                                            offset=self.offset - 1),
+                                                       info={'plot': self.site.language(30031) %
+                                                                     (self.offset + 1)}))
 
+        if self.data.get('pagination', ""):
             self.list_items.append(self.create_menu_li("home", label=30020, is_folder=True, is_playable=False,
                                                        url=self.site.url,
                                                        info={'plot': self.site.language(30021)}))
@@ -89,16 +76,12 @@ class Page(object):
 
             self.cache_data()
 
-        if self.pages > 1:
-            if self.offset < self.pages - 1:
-                self.list_items.append(self.create_menu_li("last", label=30034, is_folder=True, is_playable=False,
-                                                           url=self.get_nav_url(offset=self.pages - 1),
-                                                           info={'plot': self.site.language(30031) % (
-                                                           self.offset + 1, self.pages)}))
-                self.list_items.append(self.create_menu_li("next", label=30030, is_folder=True, is_playable=False,
-                                                           url=self.get_nav_url(offset=self.offset + 1),
-                                                           info={'plot': self.site.language(30031) % (
-                                                           self.offset + 1, self.pages)}))
+        if self.next_page:
+            self.list_items.append(self.create_menu_li("first", label=30030, is_folder=True, is_playable=False,
+                                                       url=self.get_nav_url(load_url=self.next_page,
+                                                                            offset=self.offset + 1),
+                                                       info={'plot': self.site.language(30031) %
+                                                                     (self.offset + 1)}))
 
         self.postload()
 
@@ -121,20 +104,9 @@ class Page(object):
     def play(self):
         pass
 
-    def play_url(self, url, this_episode=None, next_episode=None, stream_type="video"):
+    def play_url(self, url):
 
         xbmc.log("Play url: %s" % url, xbmc.LOGDEBUG)
-
-        if next_episode is None:
-            next_episode = {}
-
-        brand = {}
-        if 'brands' in self.params:
-            resp = self.site.request(self.site.api_url + '/brands/' + self.params['brands'], output="json")
-            if 'data' in resp:
-                brand = resp['data']
-            if self.site.addon.getSettingBool("addhistory"):
-                self.save_brand_to_history(brand)
 
         play_item = xbmcgui.ListItem(path=self.site.prepare_url(url))
 
@@ -146,84 +118,7 @@ class Page(object):
                 play_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
             play_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
 
-        if this_episode:
-            play_item.setLabel(this_episode['combinedTitle'])
-
-            self.enrich_info_tag(play_item, this_episode, brand)
-
-            play_item.setArt({'fanart': get_pic_from_element(this_episode, 'hd'),
-                              'icon': get_pic_from_element(this_episode, 'lw'),
-                              'thumb': get_pic_from_element(this_episode, 'lw'),
-                              'poster': get_pic_from_element(this_episode, 'vhdr')
-                              })
-
-            play_item.setProperty('IsPlayable', 'true')
-
-            play_item.addStreamInfo(stream_type, {'duration': this_episode.get('duration')})
-
         xbmcplugin.setResolvedUrl(self.site.handle, True, listitem=play_item)
-
-        if not self.site.addon.getSettingBool("upnext"):
-            return
-
-        # Wait for playback to start
-        kodi_player = kodiplayer.KodiPlayer()
-        if not kodi_player.waitForPlayBack(url=url):
-            # Playback didn't start
-            return
-
-        if not (next_episode is None) and 'combinedTitle' in next_episode:
-            upnext_signal(sender=self.site.id, next_info=self.get_next_info(this_episode, next_episode))
-
-    def get_this_and_next_episode(self, episode_id):
-        self.offset = self.params['offset'] if 'offset' in self.params else 0
-        self.limit = self.get_limit_setting()
-
-        self.cache_file = self.get_cache_filename()
-
-        if os.path.exists(self.cache_file):
-            with open(self.cache_file, 'r+') as f:
-                self.data = json.load(f)
-            for i, episode in enumerate(self.data['data']):
-                if str(episode['id']) == episode_id:
-                    return episode, self.data['data'][i + 1] if i < min(self.limit, len(self.data['data'])) - 1 else {}
-
-            xbmc.log("Reached page bottom, loading next page?")
-            return {}, {}
-        else:
-            return {}, {}
-
-    def get_next_info(self, this_episode, next_episode):
-        return {'current_episode': self.create_next_info(this_episode),
-                'next_episode': self.create_next_info(next_episode),
-                'play_url': self.get_play_url(next_episode)}
-
-    def get_play_url(self, element):
-        return ""
-
-    def create_next_info(self, episode):
-        """
-        Returns the structure needed for service.upnext addon for playback of next episode.
-        Called by get_next_info method.
-        This method is to be overridden in case if the episode structure is not compatible
-
-        @param episode:
-        @return: nex_info structure for the specified episode
-        """
-        return {'episodeid': episode['id'],
-                'tvshowid': self.params['brands'],
-                'title': episode['episodeTitle'],
-                'art': {'thumb': get_pic_from_element(episode, 'lw'),
-                        'fanart': get_pic_from_element(episode, 'hd'),
-                        'icon': get_pic_from_element(episode, 'lw'),
-                        'poster': get_pic_from_element(episode, 'vhdr')
-                        },
-                'episode': episode['series'],
-                'showtitle': episode['brandTitle'],
-                'plot': episode['anons'],
-                'playcount': 0,
-                'runtime': episode['duration']
-                }
 
     def create_element_li(self, element):
         return element
@@ -282,27 +177,20 @@ class Page(object):
 
         return int(now - mod_time) > self.cache_expire
 
-    def get_nav_url(self, offset=0):
+    def get_nav_url(self, load_url, offset=0):
         return get_url(self.site.url,
                        action=self.site.action,
                        context=self.site.context,
-                       limit=self.limit, offset=offset, url=self.site.url)
+                       load_url=load_url, offset=offset, url=self.site.url)
 
     def append_li_for_element(self, element):
         self.list_items.append(self.create_element_li(element))
 
-    def get_limit_setting(self):
-        return (self.site.addon.getSettingInt('itemsperpage') + 1) * 10
-
-    def set_limit_offset_pages(self):
-        if self.data.get('pagination'):
-            self.offset = self.data['pagination'].get('offset', 0)
-            self.limit = self.data['pagination'].get('limit', 0)
-            self.pages = self.data['pagination'].get('pages', 0)
-
-            if self.pages * self.limit >= MAXRECORDS:
-                self.pages = int(MAXRECORDS / self.limit)
-                xbmc.log("Max page limited to %d" % self.pages, xbmc.LOGDEBUG)
+    def set_navigation_pages(self):
+        self.offset = int(self.params.get('offset', "0"))
+        if 'pagination' in self.data:
+            self.prev_page = self.data['pagination']['prev']
+            self.next_page = self.data['pagination']['next']
 
     def create_menu_li(self, label_id, label, is_folder, is_playable, url,
                        info=None, art=None,
@@ -314,16 +202,6 @@ class Page(object):
                 'art': {'icon': self.site.get_media("%s.png" % label_id),
                         'fanart': self.site.get_media("background.jpg")} if art is None else art}
 
-    def get_pic_from_id(self, pic_id, res="lw"):
-        if pic_id:
-            return "|".join(["%s/pictures/%s/%s/redirect" % (self.site.cdnapi_url, pic_id, res),
-                             "User-Agent=%s" % encode4url(USER_AGENT)])
-        else:
-            if res == "hd":
-                return self.site.get_media("background.jpg")
-            else:
-                return ""
-
     @staticmethod
     def format_date(s):
         if s:
@@ -332,37 +210,11 @@ class Page(object):
             return ""
 
     @staticmethod
-    def get_mpaa(age):
-        if age == u'':
-            return 'G'
-        elif age == 6:
-            return 'PG'
-        elif age == 12:
-            return 'PG-13'
-        elif age == 16:
-            return 'R'
-        elif age == 18:
-            return 'NC-17'
-        else:
-            return ''
-
-    @staticmethod
     def get_country(countries):
         if type(countries) is list and len(countries) > 0:
             return countries[0]['title']
         else:
             return ""
-
-    @staticmethod
-    def get_logo(ch, res="xxl"):
-        try:
-            return ch['logo'][res]['url']
-        except KeyError:
-            return ""
-
-    def get_person_thumbnail(self, name):
-        name_hash = hashlib.md5(name.encode())
-        return "%s/p%s.jpg" % (self.site.thumb_path, name_hash.hexdigest())
 
     def show_list_items(self):
 
@@ -445,61 +297,3 @@ class Page(object):
 
     def get_cache_filename_prefix(self):
         return self.context
-
-    def get_video_url(self, sources):
-        if sources:
-            vquality = int(self.site.addon.getSetting("vquality"))
-            xbmc.log("Quality = %s" % vquality)
-            if vquality > 0 and 'mp4' in sources:
-                for vq in self.VQUALITY[vquality:]:
-                    if vq in sources['mp4']:
-                        return sources['mp4'].get(vq)
-
-            return sources['m3u8'].get('auto')
-        return ""
-
-    def parse_body(self, element, tag='body'):
-        result = {}
-        if tag in element:
-            body = element[tag]
-            body_parts = clean_html(body).splitlines() if body else []
-            delimiter = re.compile(r',|;')
-            for key in self.KEYWORDS:
-                if len(body_parts) > 0:
-                    lbgroups = ["(%s)" % kw for kw in self.KEYWORDS[key]]
-                    pattern = re.compile(r"(?:%s)(?P<text>.*)" % '|'.join(lbgroups), re.UNICODE)
-                    for part in body_parts:
-                        m = pattern.search(part)
-                        if m:
-                            result[key] = [x.strip() for x in delimiter.split(m.group('text'))]
-                if not (key in result):
-                    result[key] = []
-
-            result['plot'] = "\r\n".join(body_parts)
-
-        return result
-
-
-def get_pic_from_plist(plist, res, append_headers=True):
-    if plist:
-        ep_pics = None
-        if 'sizes' in plist:
-            ep_pics = plist.get('sizes')
-        elif len(plist) > 0:
-            ep_pics = plist[0].get('sizes')
-
-        if ep_pics:
-            pic = next(p for p in ep_pics if p['preset'] == res)
-            if append_headers:
-                return "|".join([pic.get('url', ""), "User-Agent=%s" % encode4url(USER_AGENT)])
-            else:
-                return pic.get('url', "")
-
-    return ""
-
-
-def get_pic_from_element(element, res, append_headers=True):
-    try:
-        return get_pic_from_plist(element['pictures'], res, append_headers)
-    except KeyError:
-        return ""

@@ -41,13 +41,12 @@ class User:
         self._headers = {
             'User-Agent': USER_AGENT,
             'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            'Accept-Encoding': "gzip, deflate, br",
+            'Accept-Encoding': "gzip",
             'Accept-Language': "en-US,en;q=0.5",
             'Connection': "keep-alive",
             'Sec-Fetch-Dest': "document",
             'Sec-Fetch-Mode': "navigate",
-            'Sec-Fetch-Site': "none",
-            'Sec-Fetch-User': "?1",
+            'Sec-Fetch-Site': "cross-site",
             'Sec-GPC': "1",
             'Upgrade-Insecure-Requests': "1"}
 
@@ -56,17 +55,17 @@ class User:
         self._load_cookies()
 
         # If UID not in cookies, request it
-        if not ('ngx_uid' in self.session.cookies):
+        if not ('yandexuid' in self.session.cookies):
             xbmc.log("Cookie file not found or missing UID, requesting from %s" % self.domain, xbmc.LOGDEBUG)
-            self.get_http("https://%s" % self.domain)
+            self.get_http("https://%s/video" % self.domain)
             self._save_cookies()
 
     def watch(self, site, context=""):
         """
 
-        :param site: Smotrim
+        :param site: YandexZen
         :return:
-        @param site: assumed Smotrim class
+        @param site: assumed YandexZen class
         @param context: context to load. If empty then site will use CLI arguments
         """
         self.init_session(site)
@@ -74,6 +73,7 @@ class User:
         if self._login():
             site.show_to(self, context)
 
+        self._save_cookies()
         self.session.close()
 
     def _login(self):
