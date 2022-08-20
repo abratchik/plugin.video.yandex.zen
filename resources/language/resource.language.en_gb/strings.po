@@ -89,8 +89,8 @@ msgid "Account"
 msgstr "Account"
 
 msgctxt "#30101"
-msgid "Phone number"
-msgstr "Phone number"
+msgid "Login"
+msgstr "Login"
 
 msgctxt "#30110"
 msgid "Interface"

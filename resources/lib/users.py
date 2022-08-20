@@ -3,6 +3,7 @@
 # Author: Alex Bratchik
 # Created on: 03.04.2021
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+import json
 import os
 import re
 import pickle
@@ -12,6 +13,7 @@ import requests
 import xbmc
 import xbmcgui
 
+from urllib.parse import quote as encode4url
 from resources.lib.yandexzen import USER_AGENT
 
 NEVER = 100 * 1000 * 60 * 60 * 24
@@ -19,7 +21,7 @@ NEVER = 100 * 1000 * 60 * 60 * 24
 
 class User:
     def __init__(self):
-        self.phone = ""
+        self.yandex_login = ""
         self.domain = ""
         self._geo = {}
 
@@ -29,11 +31,15 @@ class User:
         self._headers = {}
 
         self._cookies_file = ""
+        self.users_file = ""
+        self.user_data = []
+        self.usr = {}
 
     def init_session(self, site):
         self._site = site
 
-        self.phone = site.addon.getSetting("phone")
+        self.yandex_login = site.addon.getSetting("yandex_login")
+        self.users_file = os.path.join(self._site.data_path, "users.json")
         self.domain = site.domain
 
         self.session = requests.Session()
@@ -55,9 +61,9 @@ class User:
         self._load_cookies()
 
         # If UID not in cookies, request it
-        if not ('yandexuid' in self.session.cookies):
+        if not ('_yasc' in self.session.cookies):
             xbmc.log("Cookie file not found or missing UID, requesting from %s" % self.domain, xbmc.LOGDEBUG)
-            self.get_http("https://%s/video" % self.domain)
+            self._register_client()
             self._save_cookies()
 
     def watch(self, site, context=""):
@@ -78,16 +84,16 @@ class User:
 
     def _login(self):
 
-        if not self.phone:
+        if not self.yandex_login:
             self._logout()
             return True
         else:
-            if 'phone' in self.session.cookies:
-                if not (self.session.cookies['phone'] == self.phone):
-                    # phone has changed, logout
+            if 'yandex_login' in self.session.cookies:
+                if not (self.session.cookies['yandex_login'] == self.yandex_login):
+                    # account has changed, logout
                     self._logout()
             else:
-                self.session.cookies.set("phone", self.phone,
+                self.session.cookies.set("yandex_login", self.yandex_login,
                                          expires=NEVER,
                                          domain=self._site.id,
                                          path="/")
@@ -96,88 +102,9 @@ class User:
         if self._is_login():
             return True
 
-        login_url = "https://" + self.domain + "/personal/login?redirect=%2F"
+        # self.usr = self._get_user(yandex_login=self.yandex_login)
 
-        # Set region
-        self.load_geo()
-        self.session.cookies.set("region", self.get_region(), expires=NEVER, domain=self.domain, path="/")
-        xbmc.log("Region is %s" % self.session.cookies['region'], xbmc.LOGDEBUG)
-
-        # Set headers
-        headers = ({'User-Agent': USER_AGENT,
-                    'Accept': "*/*",
-                    'Accept-Encoding': "gzip, deflate, br",
-                    'Accept-Language': "en-US,en;q=0.5",
-                    'Connection': "keep-alive",
-                    'Host': self.domain,
-                    'Referer': "https://%s/" % self.domain,
-                    'Sec-Fetch-Dest': "empty",
-                    'Sec-Fetch-Mode': "same-origin",
-                    'Sec-Fetch-Site': "same-origin",
-                    'Sec-GPC': "1",
-                    'X-Requested-With': "XMLHTTPRequest"
-                    })
-
-        # Try to login - first load the form
-        resp = self.session.get(login_url, headers=headers)
-        if resp.status_code != 200:
-            xbmc.log("Couldn't load the login page %s, error %a" % (login_url, resp.status_code), xbmc.LOGDEBUG)
-            self._logout()
-            self._save_cookies()
-            return False
-
-        self._save_cookies()
-
-        # Read the token
-        token = self._get_token(resp.text)
-        if token == "":
-            xbmc.log("Failed to retrieve the secure token from the login page %s" % login_url)
-            self._logout()
-            return False
-
-        xbmc.log("Token retrieved successfully: % s" % token)
-
-        headers.update({'Origin': "https://%s" % self.domain,
-                        'Referer': login_url})
-
-        self.session.post(login_url,
-                          files={'phone': (None, self.phone),
-                                 '_token': (None, token)},
-                          headers=headers)
-
-        auth_code = xbmcgui.Dialog().numeric(0, self._site.language(30500), "")
-
-        if not auth_code:
-            self._logout()
-            self._save_cookies()
-            return False
-
-        xbmc.log("Send the code %s for authorization to %s" % (auth_code, self.domain), xbmc.LOGDEBUG)
-
-        self.session.post(login_url,
-                          files={'code': (None, auth_code),
-                                 'phone': (None, self.phone)},
-                          headers=headers)
-
-        if self._is_login():
-            xbmc.log("User login SUCCESS, id=%s, usgr=%s" %
-                     (self.session.cookies['smid'], self.session.cookies['usgr']), xbmc.LOGDEBUG)
-            self._save_cookies()
-            return True
-
-        return False
-
-    def load_geo(self):
-        if not ('data' in self._geo):
-            xbmc.log("Loading geo data", xbmc.LOGDEBUG)
-            self._geo = self.get_http(self._site.api_url + '/geo').json()
-        return self._geo
-
-    def get_region(self):
-        try:
-            return self._geo['data']['locale']['region']
-        except KeyError:
-            return ""
+        return True
 
     def get_headers(self, type="dict"):
         if type == "dict":
@@ -202,13 +129,18 @@ class User:
         self._headers.update({'Host': host})
 
     def _logout(self):
-        if 'smid' in self.session.cookies:
-            self.session.cookies.clear(domain=self.domain, path="/", name="smid")
-        if 'usgr' in self.session.cookies:
-            self.session.cookies.clear(domain=self.domain, path="/", name="usgr")
+        if 'yandex_login' in self.session.cookies:
+            self.session.cookies.clear(domain=self.yandex_login, path="/", name="yandex_login")
 
     def _is_login(self):
-        return ('smid' in self.session.cookies) and ('usgr' in self.session.cookies)
+        return 'yandex_login' in self.session.cookies
+
+    def _register_client(self):
+        headers = dict(self._headers)
+        headers.update({'Sec-Fetch-Site': "none",
+                        'Sec-Fetch-User': "?1"})
+        query_url = "https://%s/video" % self._site.api_host
+        self.get_http(query_url, headers=headers)
 
     def _save_cookies(self):
         with open(self._cookies_file, "wb") as f:
@@ -222,12 +154,16 @@ class User:
                     xbmc.log(str(c), xbmc.LOGDEBUG)
                     self.session.cookies.set_cookie(c)
 
-    def _get_token(self, html_text):
-        # xbmc.log(html_text, xbmc.LOGDEBUG)
-        input_match = re.search(r"<input.*\"_token\".*>", html_text)
-        if input_match:
-            # xbmc.log("Found token field %s" % input_match.group(0), xbmc.LOGDEBUG)
-            token_match = re.search(r"(value\s*=\s*\")(.+)(\">)", input_match.group(0))
-            if token_match and (len(token_match.group()) > 1):
-                return token_match.group(2)
-        return ""
+
+    def _get_users(self):
+        if os.path.exists(self.users_file):
+            with open(self.users_file, "r") as f:
+                return json.load(f)
+        else:
+            return []
+
+    def _get_user(self, yandex_login):
+        if not self.user_data:
+            self.user_data = self._get_users()
+        query = [usr for usr in self.user_data if usr.get('yandex_login') == yandex_login]
+        return query[0] if query else None

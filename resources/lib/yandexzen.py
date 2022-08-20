@@ -38,9 +38,9 @@ class YandexZen:
 
         self.params = {}
 
-        self.domain = "zen.yandex.ru"
-        self.api_host = self.domain
-        self.cdnapi_host = self.domain
+        self.domain = "yandex.ru"
+        self.api_host = "zen.%s" % self.domain
+        self.cdnapi_host = self.api_host
         self.api_url = "https://%s/api/v3" % self.api_host
         self.cdnapi_url = self.api_url
         self.liveapi_host = self.domain
@@ -59,7 +59,7 @@ class YandexZen:
 
         xbmc.log("Addon: %s" % self.id, xbmc.LOGDEBUG)
         xbmc.log("Handle: %d" % self.handle, xbmc.LOGDEBUG)
-        xbmc.log("User: %s" % user.phone, xbmc.LOGDEBUG)
+        xbmc.log("User: %s" % user.yandex_login, xbmc.LOGDEBUG)
 
         if context:
             self.params = {'context': context}

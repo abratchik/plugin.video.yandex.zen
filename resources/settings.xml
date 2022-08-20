@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category id="account" label="30100">
-        <setting id="phone" type="text" label="30101" default="" />
-    </category>
-    <category id="interface" label="30110">
-        <setting id="upnext" type="bool" label="30113" default="true" />
+        <setting id="yandex_login" type="text" label="30101" default="" />
     </category>
 </settings>

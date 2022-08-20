@@ -89,8 +89,8 @@ msgid "Account"
 msgstr "Профиль"
 
 msgctxt "#30101"
-msgid "Phone number"
-msgstr "Номер телефона"
+msgid "Login"
+msgstr "Пользователь"
 
 msgctxt "#30110"
 msgid "Interface"

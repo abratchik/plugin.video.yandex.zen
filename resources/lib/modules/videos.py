@@ -98,7 +98,7 @@ class Video(pages.Page):
                 }
 
     def create_root_li(self):
-        return self.create_menu_li("channels", 30120, is_folder=True, is_playable=False,
+        return self.create_menu_li("videos", 30120, is_folder=True, is_playable=False,
                                    url=get_url(self.site.url, action="load",
                                                context="videos",
                                                content="videos",
