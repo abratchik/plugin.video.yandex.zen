@@ -12,6 +12,7 @@ import requests
 
 import xbmc
 import xbmcgui
+import jwt
 
 from urllib.parse import quote as encode4url
 from resources.lib.yandexzen import USER_AGENT
@@ -35,10 +36,15 @@ class User:
         self.user_data = []
         self.usr = {}
 
+        self.client_id = ""
+        self.client_secret = ""
+
     def init_session(self, site):
         self._site = site
 
         self.yandex_login = site.addon.getSetting("yandex_login")
+        self.client_id = site.addon.getSetting("client_id")
+        self.client_secret = site.addon.getSetting("client_secret")
         self.users_file = os.path.join(self._site.data_path, "users.json")
         self.domain = site.domain
 
@@ -153,7 +159,6 @@ class User:
                 for c in cj:
                     xbmc.log(str(c), xbmc.LOGDEBUG)
                     self.session.cookies.set_cookie(c)
-
 
     def _get_users(self):
         if os.path.exists(self.users_file):

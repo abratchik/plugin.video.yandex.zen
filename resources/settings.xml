@@ -2,5 +2,7 @@
 <settings>
     <category id="account" label="30100">
         <setting id="yandex_login" type="text" label="30101" default="" />
+        <setting id="client_id" type="text" visible="false" default="c496622217f644ebb3a4a6bf5ff45a88" />
+        <setting id="client_secret" type="text" visible="false" default="1f13f9046d4d463cbac3cca1377b8712" />
     </category>
 </settings>
