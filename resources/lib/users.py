@@ -5,16 +5,12 @@
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 import json
 import os
-import re
 import pickle
 
 import requests
 
 import xbmc
-import xbmcgui
-import jwt
 
-from urllib.parse import quote as encode4url
 from resources.lib.yandexzen import USER_AGENT
 
 NEVER = 100 * 1000 * 60 * 60 * 24
