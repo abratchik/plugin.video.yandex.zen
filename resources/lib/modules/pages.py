@@ -222,6 +222,9 @@ class Page(object):
 
         # Iterate through categories
         for category in self.list_items:
+
+            if category['label'] == "":
+                continue
             # Create a list item with a text label and a thumbnail image.
             list_item = xbmcgui.ListItem(label=category['label'])
 

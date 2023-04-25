@@ -38,8 +38,8 @@ class YandexZen:
 
         self.params = {}
 
-        self.domain = "yandex.ru"
-        self.api_host = "zen.%s" % self.domain
+        self.domain = "dzen.ru"
+        self.api_host = self.domain
         self.cdnapi_host = self.api_host
         self.api_url = "https://%s/api/v3" % self.api_host
         self.cdnapi_url = self.api_url

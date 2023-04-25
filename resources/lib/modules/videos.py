@@ -79,8 +79,8 @@ class Video(pages.Page):
         return {'data': []}
 
     def create_element_li(self, element):
-        title = clean_html(element['title'])
-        return {'id': element['id'],
+        title = clean_html(element.get('title',""))
+        return {'id': element.get('id', ""),
                 'label': title,
                 'is_folder': False,
                 'is_playable': True,
@@ -90,7 +90,7 @@ class Video(pages.Page):
                                spath=element.get('video', {}).get('id', ""),
                                url=self.site.url),
                 'info': {'mediatype': "movie",
-                         'plot': "[B]%s[/B]\n\n%s" % (element['domain'], title)},
+                         'plot': "[B]%s[/B]\n\n%s" % (element.get('domain',""), title)},
                 'art': {'thumb': element.get('image', ""),
                         'icon': element.get('image_squared', ""),
                         'fanart': element.get('big_card_image', ""),
